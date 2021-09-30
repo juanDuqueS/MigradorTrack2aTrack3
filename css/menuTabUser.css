@@ -1,0 +1,43 @@
+﻿html,body{font-family:Arial;left:0px;top:0px;margin:0px;height:99%;font-size:xx-small}
+#toggleButtonBarraNavegacion{background-image:url(../img/btnToggleModulos.png);height:31px;width:176px;text-align:center;margin-left:50%;top:29px;position:absolute;z-Index:15001;background-repeat:no-repeat;}
+#dvnomModulo{ font-family:Segoe UI; font-size:medium; color:White; font-weight:bold}
+#barraNavegacion{z-Index:15000;}
+#tabmenu {
+	color: #0000FF;
+	border-bottom: 2px solid black;
+	margin: 10px 0px 0px 0px;
+	padding: 0px;
+	padding-left: 10px }
+
+#tabmenu li { 
+	display: inline;
+	overflow: hidden;
+	list-style-type: none; }
+
+#tabmenu a, a.active {
+	color: White;
+	background: #CCCC999;/*0066CC*//*D4C0C8*/
+	font: bold 1em "Trebuchet MS", Arial, sans-serif;
+	border: 2px solid black;
+	padding: 2px 5px 0px 5px;
+	margin: 0;
+	text-decoration: none; }
+	
+#tabmenu a.close {
+	background: #CCCC999;
+	border-bottom: 2px solid transparent; }
+
+#tabmenu a.active {
+	background: #993333;/*FF6600*/
+	border-bottom: 2px solid transparent; }
+
+#tabmenu a:hover {
+	color: White;
+	background: Gray; }
+
+#tabmenu a:visited {
+	color: White; }
+
+#tabmenu a.active:hover {
+	background: #CCCCCC;/*ABAD85*/
+	color: White; }

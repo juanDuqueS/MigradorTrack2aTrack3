@@ -1,0 +1,20 @@
+﻿jQuery.extend(jQuery.validator.messages, {
+    required: "Este campo es obligatorio.",
+    remote: "Por favor, rellenar este campo.",
+    email: "Ingresar una dirección de correo válida",
+    url: "Ingresar una URL válida.",
+    date: "Ingresar una fecha válida.",
+    dateISO: "Ingresar una fecha (ISO) válida.",
+    number: "Ingresar un número entero válido.",
+    digits: "Ingresar sólo dígitos.",
+    creditcard: "Ingresar un número de tarjeta válido.",
+    equalTo: "Ingresar el mismo valor de nuevo.",
+    accept: "Ingresar archivo con extensión válida.",
+    extension: "Sólo se aceptan archivos con extensión {0}",
+    maxlength: jQuery.validator.format("Ingresar máximo {0} caracteres."),
+    minlength: jQuery.validator.format("Ingresar mínimo {0} caracteres."),
+    rangelength: jQuery.validator.format("Ingresar un valor entre {0} y {1} caracteres."),
+    range: jQuery.validator.format("Ingresar un valor entre {0} y {1}."),
+    max: jQuery.validator.format("Ingresar un valor menor o igual a {0}."),
+    min: jQuery.validator.format("Ingresar un valor mayor o igual a {0}.")
+});

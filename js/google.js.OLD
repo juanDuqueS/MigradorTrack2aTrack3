@@ -1,0 +1,371 @@
+﻿var map;
+var markers = [];
+var heatdata = [];
+var heatmap;
+var markersitios = [];
+var poligonos = [];
+
+function initialize() {
+    var mapOptions = {
+        zoom: 14,
+        center: new google.maps.LatLng(-33.370765, -70.465768),
+        mapTypeId: google.maps.MapTypeId.SATELLITE
+        
+    };
+    map = new google.maps.Map(document.getElementById('map-canvas'),
+        mapOptions);
+
+    heatmap = new google.maps.visualization.HeatmapLayer({
+        data: heatdata,
+        map: map
+    });
+
+    map.addListener('zoom_changed', function () { //Listener cuando el zoom cambia
+        //if (map.getZoom() < 15) {
+        //    $("#mensaje_zoom").css('display', 'block');
+        //    $("#mensaje_zoom").fadeOut(6000);
+        //} else {
+        //    $("#mensaje_zoom").css('display', 'none');
+        //    if ((sitios_cliente != undefined) && (map.getZoom() > 14)) {
+        //        deletePoligonos();
+        //        DibujarSitios(sitios_cliente);
+        //    }
+        //}
+        deletePoligonos();
+        DibujarSitios(sitios_cliente);
+
+    });
+
+    map.addListener('dragend', function () { //Listener cuando el mapa se mueve
+
+        if ((sitios_cliente != undefined) && (map.getZoom() > 14)) {
+            deletePoligonos();
+            DibujarSitios(sitios_cliente);
+        } else {
+        }
+    });
+
+   
+
+   
+}
+
+function setMapNull(map) {
+
+    for (var i = 0; i < markersitios.length; i++) {
+
+        markersitios[i].setMap(map);
+    }
+    for (var i = 0; i < poligonos.length; i++) {
+
+        poligonos[i].setMap(map);
+    }
+
+}
+
+function deletePoligonos() {
+    clearPoligonos();
+    markersitios = [];
+    poligonos = [];
+}
+
+function clearPoligonos() {
+    setMapNull(null);
+}
+
+function DibujarSitios(Sitios) {
+    var largo = Sitios.length;
+
+    var bounds = map.getBounds();
+
+    var NECorner = bounds.getNorthEast();
+    var SWCorner = bounds.getSouthWest();
+
+    var corner1 = new google.maps.LatLng(NECorner.lat(), NECorner.lng());
+    var corner2 = new google.maps.LatLng(NECorner.lat(), SWCorner.lng());
+    var corner3 = new google.maps.LatLng(SWCorner.lat(), SWCorner.lng());
+    var corner4 = new google.maps.LatLng(SWCorner.lat(), NECorner.lng());
+
+    var mapsCoords = [
+    { lat: SWCorner.lat(), lng: SWCorner.lng() },
+    { lat: SWCorner.lat(), lng: NECorner.lng() },
+    { lat: NECorner.lat(), lng: NECorner.lng() },
+    { lat: NECorner.lat(), lng: SWCorner.lng() }
+    ];
+
+
+    var limitesMapa = new google.maps.Polygon({ paths: mapsCoords });
+
+    setMapNull(null);
+
+
+    for (var i = 0; i < largo; i++) {
+        var coordenadas = Sitios[i].Poligono;
+        var NomSitio = Sitios[i].NomSitioCliente;
+        var Codigo = Sitios[i].Cod_SitioCliente;
+        var TipoSitio = Sitios[i].Cod_TipoSitioCliente;
+        var Radio = Sitios[i].Radio;
+        var Latitud = Sitios[i].Latitud;
+        var Longitud = Sitios[i].Longitud;
+        var CodRefSitioCliente = Sitios[i].Cod_RefSitioCliente;
+
+        punto = new google.maps.LatLng(Latitud, Longitud);
+
+        var result = (google.maps.geometry.poly.containsLocation(punto, limitesMapa) ? true : false);
+
+        if (result == true) {
+            dibujo(coordenadas, NomSitio, Codigo, TipoSitio, Radio, Latitud, Longitud, CodRefSitioCliente);
+        }
+
+    }
+
+    setMapNull(map);
+
+
+
+
+}
+
+
+function dibujo(puntos, NomSitio, Codigo, TipoSitio, Radio, Latitud, Longitud, CodRefSitioCliente) {
+
+    try {
+        var color;
+        var flag
+        var linea;
+
+
+        if ((TipoSitio == 1) || (TipoSitio == "CASA MATRIZ")) {
+            color = '#000000'; //Rojo
+            linea = '#000000';
+            flag = '../img/map/pin_azul.png';//Negro
+        }
+
+        if ((TipoSitio == 2) || (TipoSitio == "PLANTA O BASE")) {
+            color = '#FF0000'; //Rojo
+            linea = '#000000'; //Negro
+            flag = '../img/map/pin_rojo.png';
+        }
+        if ((TipoSitio == 3) || (TipoSitio == "PUNTO DE ATENCION")) {
+            color = '#090F59'; //Azul
+            linea = '#FF0000'; //Rojo
+            flag = '../img/map/pin_azul.png';
+        }
+        if ((TipoSitio == 4) || (TipoSitio == "PUNTO DE CONTROL")) {
+            color = '#F0FA33'; //Amarillo
+            linea = '#FF0000'; //Rojo
+            flag = '../img/map/pin_amarillo.png';
+        }
+        var bounds = new google.maps.LatLngBounds();
+
+
+
+        if (parseInt(Radio) > 0) { //CIRCULO
+
+            tipo = 'circulo';
+            var centro = new google.maps.LatLng(Latitud, Longitud);
+
+            var cityCircle;
+            var circuloEnMapa = new google.maps.Circle({
+                strokeColor: linea,
+                strokeOpacity: 1,
+                strokeWeight: 1,
+                fillColor: color,
+                fillOpacity: 0.2,
+                center: centro,
+                radius: parseInt(Radio),
+                //map: map
+            });
+
+
+
+            circuloEnMapa.metadata = { id: Codigo, tipo: TipoSitio };
+
+            circuloEnMapa.setMap(map);
+
+            poligonos.push(circuloEnMapa);
+
+            google.maps.event.addListener(circuloEnMapa, "rightclick", function (event) {
+                var lat = event.latLng.lat();
+                var lng = event.latLng.lng();
+
+                alert("Lat=" + lat + "; Lng=" + lng);
+            });
+            var markersitio = new google.maps.Marker({
+                position: centro,
+                //map: map,
+                title: NomSitio,
+                icon: flag,
+            });
+            markersitio.metadata = { id: Codigo, tipo: TipoSitio };
+            var MHtml = "<div><label>" + NomSitio + "</label></div>"
+           + "<div>Código:" + CodRefSitioCliente + "</div>";
+
+            var MInfoWindow = new google.maps.InfoWindow({
+                content: MHtml,
+                maxWidth: 250
+            });
+            //open infowindow on click event on marker.
+            google.maps.event.addListener(markersitio, 'click', function () {
+
+                MInfoWindow.open(map, markersitio);
+            });
+            markersitios.push(markersitio);
+
+
+        } else { //POLIGONO
+
+            tipo = 'poligono';
+            var lat_lng = puntos.split(',');
+            var coordenadasPoligono = [];
+            var x = 0;
+            for (var i = 0; i < lat_lng.length; i = i + 2) {
+                coordenadasPoligono[x] = (new google.maps.LatLng(lat_lng[i], lat_lng[i + 1]));
+                x++;
+            }
+
+
+            var markersitio = new google.maps.Marker({
+                position: coordenadasPoligono[1],
+                //map: map,
+                title: NomSitio,
+                icon: flag,
+            });
+            markersitio.metadata = { id: Codigo, tipo: TipoSitio };
+            var MHtml = "<div><label>" + NomSitio + "</label></div>"
+               + "<div>Código:" + CodRefSitioCliente + "</div>";
+            // add an infowindow
+            var MInfoWindow = new google.maps.InfoWindow({
+                content: MHtml,
+                maxWidth: 250
+            });
+            //open infowindow on click event on marker.
+            google.maps.event.addListener(markersitio, 'click', function () {
+
+                MInfoWindow.open(map, markersitio);
+            });
+
+            markersitios.push(markersitio);
+
+            var poligonoEnMapa = new google.maps.Polygon({
+                paths: coordenadasPoligono,
+                strokeColor: linea,
+                strokeOpacity: 1,
+                strokeWeight: 1,
+                fillColor: color,
+                fillOpacity: 0.2
+            });
+
+
+            poligonoEnMapa.metadata = { id: Codigo, tipo: TipoSitio };
+            poligonos.push(poligonoEnMapa);
+
+            google.maps.event.addListener(poligonoEnMapa, "rightclick", function (event) {
+                var lat = event.latLng.lat();
+                var lng = event.latLng.lng();
+                // populate yor box/field with lat, lng
+                //alert("Lat=" + lat + "; Lng=" + lng);
+            });
+
+
+
+
+
+
+            //poligonoEnMapa.setMap(map);
+
+        }
+
+
+
+    } catch (Exception) {
+        console.log(Exception);
+    }
+
+
+}
+
+
+function heatMap(latitud, longitud, objeto) {
+    
+    heatdata = [];
+    
+    for (var i = 0; i < objeto.length ; i++) {
+        heatdata.push(new google.maps.LatLng(objeto[i].Latitud, objeto[i].Longitud));
+    }
+    
+    heatmap.set('data', heatdata);
+   
+   
+}
+
+function centrarMapa(map, latitud, longitud) {
+    var coordenadas = new google.maps.LatLng(latitud, longitud);
+    map.setCenter(coordenadas);
+}
+
+function marker(latitud, longitud) {
+    var coordenada = new google.maps.LatLng(latitud, longitud);
+    deleteMarkers();
+
+    var marker = new google.maps.Marker({
+        position: coordenada,
+	zIndex: 9999999,
+        map: map
+    });
+    map.setCenter(coordenada);
+    markers.push(marker);
+}
+
+function deleteMarkers() {
+    clearMarkers();
+    markers = [];
+}
+function clearMarkers() {
+    setAllMap(null);
+}
+
+function setAllMap(map) {
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+    }
+}
+
+function setMarker(latitud, longitud, nombre, patente, fecha, ubicacion, codigo, evento, desevento, velocidad) {
+    
+    var myLatLng = new google.maps.LatLng(latitud, longitud);
+    var marker = new google.maps.Marker({
+        position: myLatLng,
+        //map: map,
+        title: nombre,
+        icon: './img/pin_maps.png',
+    });
+    marker.metadata = { type: "point", id: codigo };
+
+    var chHtml = "<div><label>" + nombre + "</label></div>"
+         + "<div>Patente:" + patente + "</div>"
+        + "<div>Ubicación:" + ubicacion + "</div>"
+        + "<div>Fecha/Hora:" + fecha + "</div>"
+        + "<div>Latitud:" + latitud + "</div>"
+        + "<div>Longitud:" + longitud + "</div>"
+        + "<div>Velocidad:" + velocidad + "</div>"
+        + "<div>Evento:" + evento + " " + desevento + "</div>";
+    // Se agrega infoWindows
+    var chInfoWindow = new google.maps.InfoWindow({
+        content: chHtml,
+        maxWidth: 250
+    });
+    //Se abre infowindows al hacer click
+    google.maps.event.addListener(marker, 'click', function () {
+
+        chInfoWindow.open(map, marker);
+    });
+
+    markers.push(marker);
+
+   
+}
+
+
+
+google.maps.event.addDomListener(window, 'load', initialize);
