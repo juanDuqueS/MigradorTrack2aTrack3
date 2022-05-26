@@ -408,7 +408,7 @@ public partial class MigraEquipos : System.Web.UI.Page
                                     break;
                             }
 
-                          if(E_Modelo != "Enfora MT-4100" && E_Modelo != "LMU26H30")
+                          if(E_Modelo != "Enfora MT-4100" && E_Modelo != "LMU26H30"  && E_Modelo != "FMU130")
                             {
                                 E_Error = "<a href=\"#\" data-toggle=\"modal\" data-target=\"#myModal\"><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></a>";
                                 E_Mensaje = "<tr><td>Problemas con equipo &nbsp</td><td>GPS :&nbsp" + E_GPS + "&nbsp" + E_Modelo + "&nbsp no está soportado para migración.</td></tr>";
